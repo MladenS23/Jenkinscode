@@ -1,23 +1,12 @@
 pipeline {
-    agent any 
-
+    agent any
     stages {
-        stage('Clone') {
+        stage('Deploy Locally') {
             steps {
-                checkout scm
-            }
-        }
-        stage('Build') {
-            steps {
-                echo 'Compiling/Packaging code...'
-                // Example: sh 'npm install' or 'mvn clean package'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Pushing code to production server...'
-                // This uses SSH to send files to your server
-                sshput remote: 'my-web-server', from: 'dist/', into: '/var/www/html'
+                // This removes the need for SSH or IP addresses
+                sh 'mkdir -p /var/jenkins_home/deployed_site'
+                sh 'rsync -avz index.html /var/jenkins_home/deployed_site/'
+                echo 'SUCCESS: Files moved locally inside Jenkins!'
             }
         }
     }
