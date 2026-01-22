@@ -1,13 +1,16 @@
 pipeline {
     agent any
+    environment {
+        // This tells Jenkins exactly where to look for the tools you just installed
+        PATH = "/usr/bin:/usr/local/bin:/bin:$PATH"
+    }
     stages {
-        stage('Deploy Locally') {
+        stage('Verify Tools') {
             steps {
-                // This removes the need for SSH or IP addresses
-                sh 'mkdir -p /var/jenkins_home/deployed_site'
-                sh 'rsync -avz index.html /var/jenkins_home/deployed_site/'
-                echo 'SUCCESS: Files moved locally inside Jenkins!'
+                sh 'docker --version'
+                sh 'python3 --version'
             }
         }
+        // ... rest of your stages
     }
 }
