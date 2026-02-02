@@ -1,39 +1,38 @@
 pipeline {
     agent any
     
-    environment {
-        GITHUB_TOKEN = credentials('github-token')
-    }
-    
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/MladenS23/Jenkinscode.git'
+                checkout scm
             }
         }
         
-        stage('Build') {
+        stage('Build & Test') {
             steps {
-                echo 'Building...'
+                echo 'Building and testing...'
             }
         }
         
-        stage('Deploy to Production') {
+        stage('Request Approval') {
             steps {
                 script {
-                    def deployment = githubDeploy(
-                        repo: 'MladenS23/Jenkinscode',
-                        environment: 'production',
-                        ref: env.GIT_COMMIT
+                    def approvers = ['MladenStamatoski', 'teammate1', 'teammate2']
+                    def userInput = input(
+                        id: 'DeployApproval',
+                        message: 'Approve deployment to production?',
+                        ok: 'Deploy',
+                        submitter: approvers.join(','),
+                        submitterParameter: 'APPROVER'
                     )
-                    
-                    input message: 'Approve deployment to production?', ok: 'Deploy'
-                    
-                    githubDeployStatus(
-                        deploymentId: deployment.id,
-                        state: 'success'
-                    )
+                    echo "Approved by: ${APPROVER}"
                 }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                echo 'Deploying to production...'
             }
         }
     }
