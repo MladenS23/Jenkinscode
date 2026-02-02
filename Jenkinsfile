@@ -4,35 +4,19 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/MladenS23/Jenkinscode.git'
             }
         }
         
-        stage('Build & Test') {
+        stage('Build') {
             steps {
-                echo 'Building and testing...'
-            }
-        }
-        
-        stage('Request Approval') {
-            steps {
-                script {
-                    def approvers = ['MladenStamatoski', 'teammate1', 'teammate2']
-                    def userInput = input(
-                        id: 'DeployApproval',
-                        message: 'Approve deployment to production?',
-                        ok: 'Deploy',
-                        submitter: approvers.join(','),
-                        submitterParameter: 'APPROVER'
-                    )
-                    echo "Approved by: ${APPROVER}"
-                }
+                echo 'Building...'
             }
         }
         
         stage('Deploy') {
             steps {
-                echo 'Deploying to production...'
+                echo 'Waiting for GitHub approval...'
             }
         }
     }
