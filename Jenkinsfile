@@ -4,7 +4,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/MladenS23/Jenkinscode.git'
+                git branch: 'main', 
+                    credentialsId: 'github-creds', 
+                    url: 'https://github.com/MladenS23/Jenkinscode.git'
             }
         }
         
@@ -13,19 +15,11 @@ pipeline {
                 echo 'Building...'
             }
         }
-        
-        stage('Approval') {
-            steps {
-                script {
-                    input message: 'Approve deployment?', ok: 'Deploy'
-                }
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                echo 'Deploying...'
-            }
+    }
+    
+    post {
+        always {
+            cleanWs()
         }
     }
 }
