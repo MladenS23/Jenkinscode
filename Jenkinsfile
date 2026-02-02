@@ -14,9 +14,17 @@ pipeline {
             }
         }
         
+        stage('Approval') {
+            steps {
+                script {
+                    input message: 'Approve deployment?', ok: 'Deploy'
+                }
+            }
+        }
+        
         stage('Deploy') {
             steps {
-                echo 'Waiting for GitHub approval...'
+                echo 'Deploying...'
             }
         }
     }
