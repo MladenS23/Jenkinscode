@@ -1,28 +1,56 @@
 pipeline {
     agent any
+    
     environment {
-        PATH = "/usr/bin:/usr/local/bin:/bin:$PATH"
+        REPO_URL = 'https://github.com/username/repo.git'
+        BRANCH = 'main'
+        CREDENTIALS_ID = 'github-creds'
     }
+    
+    triggers {
+        githubPush()
+    }
+    
     stages {
-        stage('Verify Tools') {
+        stage('Checkout') {
             steps {
-                sh 'docker --version'
-                sh 'python3 --version'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${BRANCH}"]],
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        url: "${REPO_URL}",
+                        credentialsId: "${CREDENTIALS_ID}"
+                    ]]
+                ])
             }
         }
-        stage('Build & Run POC') {
+        
+        stage('Build') {
             steps {
-                // 1. Build the image from your Dockerfile
-                sh 'docker build -t my-python-app .'
-                
-                // 2. Kill any old version of the app running
-                sh 'docker rm -f my-running-app || true'
-                
-                // 3. Start the app on port 5001
-                sh 'docker run -d --name my-running-app -p 5001:5000 my-python-app'
-                
-                echo "ALIVE! Check http://localhost:5001"
+                sh 'echo "Building..."'
             }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'echo "Testing..."'
+            }
+        }
+        
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'echo "Deploying..."'
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
         }
     }
 }
