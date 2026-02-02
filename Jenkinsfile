@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    triggers {
+        githubPush()
+    }
+    
     stages {
         stage('Checkout') {
             steps {
@@ -14,11 +18,9 @@ pipeline {
             }
         }
         
-        stage('Approval') {
+        stage('Test') {
             steps {
-                script {
-                    input message: 'Approve deployment?', ok: 'Deploy'
-                }
+                echo 'Testing...'
             }
         }
         
@@ -26,6 +28,12 @@ pipeline {
             steps {
                 echo 'Deploying...'
             }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
         }
     }
 }
